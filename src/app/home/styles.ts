@@ -1,6 +1,5 @@
 import { StyleSheet } from 'react-native';
 
-
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -11,5 +10,5 @@ export const styles = StyleSheet.create({
   logo: {
     width: 134,
     height: 34,
-  }
+  },
 });
