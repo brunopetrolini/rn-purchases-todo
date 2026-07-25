@@ -1,6 +1,7 @@
 import { Image, View } from 'react-native';
 
-import { Button } from '../components/ui/Button';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { styles } from './styles';
 
 export function Home() {
@@ -8,12 +9,12 @@ export function Home() {
     <View style={styles.container}>
       <Image source={require('@/assets/logo.png')} style={styles.logo} />
 
-      <Button onPress={() => {}} title="Adicionar" />
-      <Button onPress={() => {}} title="Editar" />
-      <Button onPress={() => {}} title="Excluir" />
-      <Button onPress={() => {}} title="Visualizar" />
-      <Button onPress={() => {}} title="Atualizar" />
-      <Button onPress={() => {}} title="Remover" />
+      <View style={styles.form}>
+        <Input placeholder="O que você precisa comprar?" />
+        <Button onPress={() => {}} title="Adicionar" />
+      </View>
+
+      <View style={styles.content}></View>
     </View>
   );
 }
