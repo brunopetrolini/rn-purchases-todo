@@ -1,8 +1,10 @@
 import { StyleSheet } from 'react-native';
 
+import { colors } from '@/theme/colors';
+
 export const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#fff',
+    backgroundColor: colors['background-elevated'],
     height: 48,
     width: '100%',
     borderRadius: 8,
@@ -10,6 +12,6 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 16,
     borderWidth: 1,
-    borderColor: '#c3c5cb',
+    borderColor: colors['border-primary'],
   },
 });
