@@ -59,6 +59,13 @@ export const styles = StyleSheet.create({
     marginTop: 16,
   },
 
+  listEmpty: {
+    flex: 1,
+    color: colors['text-muted'],
+    fontSize: 14,
+    textAlign: 'center',
+  },
+
   itemSeparator: {
     height: 1,
     backgroundColor: colors['border-primary'],

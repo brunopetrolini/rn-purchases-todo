@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
+import uuid from 'react-native-uuid';
 
 import { Button } from '@/components/button';
 import { Filter } from '@/components/filter';
@@ -8,45 +9,25 @@ import { ListItem } from '@/components/list-item';
 import { FilterStatus } from '@/types/filter-status';
 import { styles } from './styles';
 
-const mockData = [
-  {
-    id: '2d63636c-7ba0-4cb8-959c-468963c8e213',
-    name: '3 Tomates',
-    isChecked: false,
-  },
-  {
-    id: '009611f9-c556-4bd9-aa47-ff10e6d0f266',
-    name: '1 Pacote de Arroz',
-    isChecked: false,
-  },
-  {
-    id: '1a887a90-46aa-4830-a2f1-c384eae2b208',
-    name: '2 Litros de Leite',
-    isChecked: false,
-  },
-  {
-    id: 'e05e9bef-92e5-4f8e-8682-749770be01c9',
-    name: '5 Bananas',
-    isChecked: false,
-  },
-  {
-    id: 'c2f0a8d4-c809-4d15-bfd5-b70fa16a77cf',
-    name: '1 Filé de Frango',
-    isChecked: false,
-  },
-];
+type Item = {
+  id: string;
+  name: string;
+  isChecked: boolean;
+};
 
 export function Home() {
   const [activeFilter, setActiveFilter] = useState<FilterStatus>(
     FilterStatus.ALL,
   );
 
-  const sortItemsByCheckedStatus = useCallback((items: typeof mockData) => {
+  const sortItemsByCheckedStatus = useCallback((items: Item[]) => {
     return items.sort((a, b) => Number(b.isChecked) - Number(a.isChecked));
   }, []);
 
-  const [items, setItems] = useState(sortItemsByCheckedStatus(mockData));
-  const [filteredItems, setFilteredItems] = useState(items);
+  const [items, setItems] = useState<Item[]>(sortItemsByCheckedStatus([]));
+  const [filteredItems, setFilteredItems] = useState<Item[]>(items);
+
+  const [inputValue, setInputValue] = useState<string>('');
 
   useEffect(() => {
     if (activeFilter === FilterStatus.ALL) {
@@ -84,13 +65,34 @@ export function Home() {
     });
   }
 
+  function handleAddItem() {
+    if (!inputValue.trim()) return;
+
+    const newItem: Item = {
+      id: uuid.v4(),
+      name: inputValue.trim(),
+      isChecked: false,
+    };
+
+    setItems((prevItems) => {
+      const updatedItems = [...prevItems, newItem];
+      return sortItemsByCheckedStatus(updatedItems);
+    });
+
+    setInputValue('');
+  }
+
   return (
     <View style={styles.container}>
       <Image source={require('@/assets/logo.png')} style={styles.logo} />
 
       <View style={styles.form}>
-        <Input placeholder="O que você precisa comprar?" />
-        <Button onPress={() => {}} title="Adicionar" />
+        <Input
+          placeholder="O que você precisa comprar?"
+          value={inputValue}
+          onChangeText={setInputValue}
+        />
+        <Button onPress={handleAddItem} title="Adicionar" />
       </View>
 
       <View style={styles.content}>
@@ -117,6 +119,9 @@ export function Home() {
         </View>
 
         <FlatList
+          ListEmptyComponent={
+            <Text style={styles.listEmpty}>Nenhum item aqui!</Text>
+          }
           style={styles.list}
           data={filteredItems}
           renderItem={({ item }) => (
