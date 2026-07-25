@@ -16,8 +16,10 @@
   "dependencies": {
     "expo": "~54.0.34",
     "expo-status-bar": "~3.0.9",
+    "phosphor-react-native": "^3.0.6",
     "react": "19.1.0",
-    "react-native": "0.81.5"
+    "react-native": "0.81.5",
+    "react-native-svg": "^15.15.5"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.3.11",
