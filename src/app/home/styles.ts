@@ -1,10 +1,12 @@
 import { StyleSheet } from 'react-native';
 
+import { colors } from '@/theme/colors';
+
 export const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
+    backgroundColor: colors['background-primary'],
     paddingTop: 62,
   },
 
@@ -23,7 +25,7 @@ export const styles = StyleSheet.create({
   content: {
     flex: 1,
     width: '100%',
-    backgroundColor: '#fff',
+    backgroundColor: colors['background-elevated'],
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     marginTop: 24,
@@ -35,5 +37,22 @@ export const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: Math.PI,
+  },
+
+  filterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+
+  filters: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+
+  clearLabel: {
+    fontSize: 12,
+    color: colors['text-muted'],
+    fontWeight: 600,
   },
 });
