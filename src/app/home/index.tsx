@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { Image, Text, TouchableOpacity, View } from 'react-native';
 
-import { Button } from '@/components/Button';
-import { Filter } from '@/components/Filter';
-import { Input } from '@/components/Input';
+import { Button } from '@/components/button';
+import { Filter } from '@/components/filter';
+import { Input } from '@/components/input';
 import { FilterStatus } from '@/types/filter-status';
 import { styles } from './styles';
 
