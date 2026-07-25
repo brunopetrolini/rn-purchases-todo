@@ -22,7 +22,7 @@ export function Home() {
       </View>
 
       <View style={styles.content}>
-        <View style={styles.filterContainer}>
+        <View style={styles.filtersContainer}>
           <View style={styles.filters}>
             <Filter
               status={FilterStatus.PENDING}

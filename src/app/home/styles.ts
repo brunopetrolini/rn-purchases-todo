@@ -30,19 +30,16 @@ export const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     marginTop: 24,
     padding: 24,
-    shadowColor: 'rgba(0, 0, 0, 0.25)',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: Math.PI,
+    paddingTop: 32,
   },
 
-  filterContainer: {
+  filtersContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    paddingBottom: 16,
+    borderBottomColor: colors['border-primary'],
+    borderBottomWidth: 1,
   },
 
   filters: {
