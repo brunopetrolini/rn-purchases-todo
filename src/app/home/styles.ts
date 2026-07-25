@@ -52,4 +52,16 @@ export const styles = StyleSheet.create({
     color: colors['text-muted'],
     fontWeight: 600,
   },
+
+  list: {
+    flex: 1,
+    width: '100%',
+    marginTop: 16,
+  },
+
+  itemSeparator: {
+    height: 1,
+    backgroundColor: colors['border-primary'],
+    marginVertical: 16,
+  },
 });
