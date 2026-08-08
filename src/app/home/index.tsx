@@ -21,7 +21,7 @@ export function Home() {
   );
 
   const sortItemsByCheckedStatus = useCallback((items: Item[]) => {
-    return items.sort((a, b) => Number(b.isChecked) - Number(a.isChecked));
+    return items.sort((a, b) => Number(a.isChecked) - Number(b.isChecked));
   }, []);
 
   const [items, setItems] = useState<Item[]>(sortItemsByCheckedStatus([]));
