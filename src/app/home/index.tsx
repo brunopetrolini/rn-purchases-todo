@@ -119,6 +119,7 @@ export function Home() {
         </View>
 
         <FlatList
+          showsVerticalScrollIndicator={false}
           ListEmptyComponent={
             <Text style={styles.listEmpty}>Nenhum item aqui!</Text>
           }
