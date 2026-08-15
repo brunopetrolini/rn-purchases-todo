@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import { v7 as uuid } from 'uuid';
 
@@ -6,61 +6,60 @@ import { Button } from '@/components/button';
 import { Filter } from '@/components/filter';
 import { Input } from '@/components/input';
 import { ListItem } from '@/components/list-item';
+import { useItemsStorage } from '@/hooks/useItemsStorage';
 import { FilterStatus } from '@/types/filter-status';
 import type { Item } from '@/types/item';
 import { styles } from './styles';
 
 export function Home() {
+  const { getItems, saveItems } = useItemsStorage();
+
   const [activeFilter, setActiveFilter] = useState<FilterStatus>(
     FilterStatus.ALL,
   );
-
-  const sortItemsByCheckedStatus = useCallback((items: Item[]) => {
-    return items.sort((a, b) => Number(a.isChecked) - Number(b.isChecked));
-  }, []);
-
-  const [items, setItems] = useState<Item[]>(sortItemsByCheckedStatus([]));
-  const [filteredItems, setFilteredItems] = useState<Item[]>(items);
-
+  const [items, setItems] = useState<Item[]>([]);
   const [inputValue, setInputValue] = useState<string>('');
 
+  const loadItems = useCallback(async () => {
+    const persistedItems = await getItems();
+    setItems(persistedItems);
+  }, [getItems]);
+
   useEffect(() => {
-    if (activeFilter === FilterStatus.ALL) {
-      setFilteredItems(sortItemsByCheckedStatus(items));
-    }
+    loadItems();
+  }, [loadItems]);
 
-    if (activeFilter === FilterStatus.PENDING) {
-      setFilteredItems(() => {
-        const pendingItems = items.filter((item) => !item.isChecked);
-        return sortItemsByCheckedStatus(pendingItems);
-      });
-    }
+  const filteredItems = useMemo(() => {
+    if (activeFilter === FilterStatus.ALL) return items;
 
-    if (activeFilter === FilterStatus.PURCHASED) {
-      setFilteredItems(() => {
-        const purchasedItems = items.filter((item) => item.isChecked);
-        return sortItemsByCheckedStatus(purchasedItems);
-      });
-    }
-  }, [activeFilter, items, sortItemsByCheckedStatus]);
+    const isChecked = activeFilter === FilterStatus.PURCHASED;
+    return items.filter((item) => item.isChecked === isChecked);
+  }, [activeFilter, items]);
 
-  function handleCheckItem(id: string) {
-    setItems((prevItems) => {
-      const updatedItems = prevItems.map((item) =>
-        item.id === id ? { ...item, isChecked: !item.isChecked } : item,
-      );
-      return sortItemsByCheckedStatus(updatedItems);
-    });
+  async function persistItems(updatedItems: Item[]) {
+    const didSave = await saveItems(updatedItems);
+
+    await loadItems();
+    return didSave;
   }
 
-  function handleDeleteItem(id: string) {
-    setItems((prevItems) => {
-      const itemsWithoutDeleted = prevItems.filter((item) => item.id !== id);
-      return sortItemsByCheckedStatus(itemsWithoutDeleted);
+  async function handleCheckItem(id: string) {
+    const updatedItems = items.map((item) => {
+      if (item.id === id) {
+        return { ...item, isChecked: !item.isChecked };
+      }
+      return item;
     });
+
+    await persistItems(updatedItems);
   }
 
-  function handleAddItem() {
+  async function handleDeleteItem(id: string) {
+    const updatedItems = items.filter((item) => item.id !== id);
+    await persistItems(updatedItems);
+  }
+
+  async function handleAddItem() {
     if (!inputValue.trim()) return;
 
     const newItem: Item = {
@@ -69,12 +68,10 @@ export function Home() {
       isChecked: false,
     };
 
-    setItems((prevItems) => {
-      const updatedItems = [...prevItems, newItem];
-      return sortItemsByCheckedStatus(updatedItems);
-    });
+    const updatedItems = [...items, newItem];
+    const didSave = await persistItems(updatedItems);
 
-    setInputValue('');
+    if (didSave) setInputValue('');
   }
 
   return (
