@@ -1,19 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
-import uuid from 'react-native-uuid';
+import { v7 as uuid } from 'uuid';
 
 import { Button } from '@/components/button';
 import { Filter } from '@/components/filter';
 import { Input } from '@/components/input';
 import { ListItem } from '@/components/list-item';
 import { FilterStatus } from '@/types/filter-status';
+import type { Item } from '@/types/item';
 import { styles } from './styles';
-
-type Item = {
-  id: string;
-  name: string;
-  isChecked: boolean;
-};
 
 export function Home() {
   const [activeFilter, setActiveFilter] = useState<FilterStatus>(
@@ -69,7 +64,7 @@ export function Home() {
     if (!inputValue.trim()) return;
 
     const newItem: Item = {
-      id: uuid.v4(),
+      id: uuid(),
       name: inputValue.trim(),
       isChecked: false,
     };
