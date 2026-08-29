@@ -1,78 +1,78 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { randomUUID } from 'expo-crypto';
+import { useEffect, useMemo, useState } from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
-import { v7 as uuid } from 'uuid';
 
 import { Button } from '@/components/button';
 import { Filter } from '@/components/filter';
 import { Input } from '@/components/input';
 import { ListItem } from '@/components/list-item';
-import { useItemsStorage } from '@/hooks/useItemsStorage';
+import { itemsStorage } from '@/storage/items-storage';
 import { FilterStatus } from '@/types/filter-status';
 import type { Item } from '@/types/item';
 import { styles } from './styles';
 
 export function Home() {
-  const { getItems, saveItems } = useItemsStorage();
-
   const [activeFilter, setActiveFilter] = useState<FilterStatus>(
     FilterStatus.ALL,
   );
   const [items, setItems] = useState<Item[]>([]);
-  const [inputValue, setInputValue] = useState<string>('');
-
-  const loadItems = useCallback(async () => {
-    const persistedItems = await getItems();
-    setItems(persistedItems);
-  }, [getItems]);
-
-  useEffect(() => {
-    loadItems();
-  }, [loadItems]);
+  const [inputValue, setInputValue] = useState('');
 
   const filteredItems = useMemo(() => {
     if (activeFilter === FilterStatus.ALL) return items;
 
-    const isChecked = activeFilter === FilterStatus.PURCHASED;
-    return items.filter((item) => item.isChecked === isChecked);
+    return items.filter((item) => item.status === activeFilter);
   }, [activeFilter, items]);
 
-  async function persistItems(updatedItems: Item[]) {
-    const didSave = await saveItems(updatedItems);
-
-    await loadItems();
-    return didSave;
-  }
-
   async function handleCheckItem(id: string) {
-    const updatedItems = items.map((item) => {
-      if (item.id === id) {
-        return { ...item, isChecked: !item.isChecked };
-      }
-      return item;
+    const updatedItem = items.find((item) => item.id === id);
+    if (!updatedItem) return;
+
+    const updatedItems = await itemsStorage.updateItem({
+      ...updatedItem,
+      status:
+        updatedItem.status === FilterStatus.PENDING
+          ? FilterStatus.PURCHASED
+          : FilterStatus.PENDING,
     });
 
-    await persistItems(updatedItems);
+    setItems(updatedItems);
   }
 
   async function handleDeleteItem(id: string) {
-    const updatedItems = items.filter((item) => item.id !== id);
-    await persistItems(updatedItems);
+    const updatedItems = await itemsStorage.deleteItem(id);
+    setItems(updatedItems);
   }
 
   async function handleAddItem() {
     if (!inputValue.trim()) return;
 
     const newItem: Item = {
-      id: uuid(),
+      id: randomUUID(),
       name: inputValue.trim(),
-      isChecked: false,
+      status: FilterStatus.PENDING,
     };
 
-    const updatedItems = [...items, newItem];
-    const didSave = await persistItems(updatedItems);
+    const updatedItems = await itemsStorage.addItem(newItem);
 
-    if (didSave) setInputValue('');
+    setItems(updatedItems);
+    setInputValue('');
   }
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function fetchItems() {
+      const persistedItems = await itemsStorage.getAllItems();
+      if (isMounted) setItems(persistedItems);
+    }
+
+    fetchItems();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -120,7 +120,7 @@ export function Home() {
           renderItem={({ item }) => (
             <ListItem
               name={item.name}
-              isChecked={item.isChecked}
+              isChecked={item.status === FilterStatus.PURCHASED}
               onCheck={() => handleCheckItem(item.id)}
               onDelete={() => handleDeleteItem(item.id)}
               key={item.id}
